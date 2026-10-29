@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">视频下载助手</string>
+    <string name="app_desc">粘贴链接，提取并下载视频</string>
+</resources>
