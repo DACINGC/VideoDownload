@@ -6,6 +6,9 @@
 - 无需服务器：解析、下载、保存全部在手机上完成
 - 可选「远程解析接口」兜底（自建 cobalt 等），应对平台风控
 
+> **下载安装**：直接安装调试包 → [Releases · v1.0.0 `VideoDownload-1.0.0-debug.apk`](https://github.com/DACINGC/VideoDownload/releases/latest)
+> （`minSdk 24` / `targetSdk 34`，debug 签名，仅供测试）
+
 ![应用图标](docs/icon-512.png)
 
 ---
@@ -129,8 +132,9 @@ gradle :app:assembleDebug
 app/build/outputs/apk/debug/app-debug.apk
 ```
 
-仓库内已提供可直接安装的调试包：[`dist/VideoDownload-1.0.0-debug.apk`](dist/VideoDownload-1.0.0-debug.apk)
-（`minSdk 24` / `targetSdk 34`，debug 签名，仅供测试）。
+不想自己编译的话，可直接下载已发布的调试包：
+[Releases · v1.0.0](https://github.com/DACINGC/VideoDownload/releases/tag/v1.0.0)
+（`minSdk 24` / `targetSdk 34`，debug 签名，仅供测试；APK 体积约 16.4 MB，不纳入 Git 版本库）。
 
 也可以直接用 Android Studio 打开根目录运行。
 
@@ -144,7 +148,7 @@ gradle :app:testDebugUnitTest
 
 ## 6. 验证记录
 
-以下结果均在 Android 16（API 36，1080×2400）模拟器上安装 `dist/VideoDownload-1.0.0-debug.apk` 实测：
+以下结果均在 Android 16（API 36，1080×2400）模拟器上安装 `VideoDownload-1.0.0-debug.apk`（v1.0.0 Release 资产）实测：
 
 | 验证项 | 方法 | 结果 |
 | --- | --- | --- |
