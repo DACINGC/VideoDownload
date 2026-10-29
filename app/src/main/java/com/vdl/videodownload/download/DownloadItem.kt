@@ -49,6 +49,11 @@ data class DownloadItem(
     val errorIsPermanent: Boolean = false
 ) {
     val displayName: String get() = "$fileName.$ext"
+
+    /** 记录显示为已完成，但保存地址已丢失（多为旧版本残留或文件被外部删除）。 */
+    val fileMissing: Boolean
+        get() = state == DownloadState.COMPLETED && savedUri.isNullOrBlank() && savedPath.isNullOrBlank()
+
     val progress: Float
         get() = when {
             state == DownloadState.COMPLETED -> 1f

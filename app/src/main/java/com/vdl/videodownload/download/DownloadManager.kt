@@ -318,20 +318,29 @@ class DownloadManager(
         }
         _items.update { list -> list.filterNot { it.id == id } }
         persist()
+        emit(if (deleteFile) "已删除记录与文件" else "已移除记录")
     }
 
+    /**
+     * 删除已下载到相册的文件。
+     * 成功（或文件早已不存在）时直接从列表移除该条目并提示；失败则保留条目并展示原因。
+     */
     fun deleteDownloadedFile(id: String) {
         val item = _items.value.firstOrNull { it.id == id } ?: return
-        val removed = MediaSaver.delete(context, item.savedUri, item.savedPath)
-        update(id) {
-            it.copy(
-                savedUri = null,
-                savedPath = null,
-                error = if (removed) null else "删除失败，文件可能已被移动",
-                errorIsPermanent = !removed
-            )
+        val deleted = MediaSaver.delete(context, item.savedUri, item.savedPath)
+        val stillExists = MediaSaver.exists(context, item.savedUri, item.savedPath)
+
+        if (deleted || !stillExists) {
+            _items.update { list -> list.filterNot { it.id == id } }
+            persist()
+            emit("已删除文件")
+        } else {
+            update(id) {
+                it.copy(error = "删除失败：文件可能正被占用，或被其它应用移走", errorIsPermanent = true)
+            }
+            persist()
+            emit("删除失败，请稍后重试")
         }
-        persist()
     }
 
     fun clearFinished() {

@@ -146,6 +146,17 @@ object MediaSaver {
         return ok
     }
 
+    /** 判断已保存的文件是否仍然存在（用于区分“删除成功”和“文件早就没了”）。 */
+    fun exists(context: Context, uriString: String?, path: String?): Boolean {
+        if (!path.isNullOrBlank() && File(path).exists()) return true
+        if (!uriString.isNullOrBlank()) {
+            return runCatching {
+                context.contentResolver.openFileDescriptor(Uri.parse(uriString), "r")?.use { true } ?: false
+            }.getOrDefault(false)
+        }
+        return false
+    }
+
     /** 打开已下载的视频。 */
     fun openIntent(context: Context, uriString: String?, path: String?, mime: String): android.content.Intent? {
         val uri = resolveUri(context, uriString, path) ?: return null

@@ -328,16 +328,24 @@ private fun DownloadCard(
                     }
 
                     DownloadState.COMPLETED -> {
-                        Button(
-                            onClick = onOpen,
-                            contentPadding = PaddingValues(horizontal = 14.dp),
-                            colors = ButtonDefaults.buttonColors()
-                        ) { Text("打开") }
-                        OutlinedButton(onClick = onShare, contentPadding = PaddingValues(horizontal = 12.dp)) {
-                            Text("分享")
+                        if (item.fileMissing) {
+                            // 兼容旧版本数据：文件已被删除但记录残留
+                            Button(onClick = onRetry, contentPadding = PaddingValues(horizontal = 14.dp)) {
+                                Text("重新下载")
+                            }
+                            TextButton(onClick = onRemove) { Text("移除") }
+                        } else {
+                            Button(
+                                onClick = onOpen,
+                                contentPadding = PaddingValues(horizontal = 14.dp),
+                                colors = ButtonDefaults.buttonColors()
+                            ) { Text("打开") }
+                            OutlinedButton(onClick = onShare, contentPadding = PaddingValues(horizontal = 12.dp)) {
+                                Text("分享")
+                            }
+                            TextButton(onClick = onDeleteFile) { Text("删除文件") }
+                            TextButton(onClick = onCopySource) { Text("复制链接") }
                         }
-                        TextButton(onClick = onDeleteFile) { Text("删除文件") }
-                        TextButton(onClick = onCopySource) { Text("复制链接") }
                     }
                 }
             }
@@ -349,15 +357,16 @@ private fun statusText(item: DownloadItem): String = when (item.state) {
     DownloadState.QUEUED -> "排队等待中"
     DownloadState.RUNNING -> "下载中"
     DownloadState.PAUSED -> "已暂停（可断点续传）"
-    DownloadState.COMPLETED -> "已保存到相册"
+    DownloadState.COMPLETED -> if (item.fileMissing) "文件已删除" else "已保存到相册"
     DownloadState.FAILED -> "下载失败"
     DownloadState.CANCELED -> "已取消"
 }
 
 @Composable
-private fun statusColor(item: DownloadItem): Color = when (item.state) {
-    DownloadState.COMPLETED -> Color(0xFF2E7D32)
-    DownloadState.FAILED -> MaterialTheme.colorScheme.error
-    DownloadState.PAUSED, DownloadState.CANCELED -> MaterialTheme.colorScheme.onSurfaceVariant
+private fun statusColor(item: DownloadItem): Color = when {
+    item.state == DownloadState.COMPLETED && item.fileMissing -> MaterialTheme.colorScheme.onSurfaceVariant
+    item.state == DownloadState.COMPLETED -> Color(0xFF2E7D32)
+    item.state == DownloadState.FAILED -> MaterialTheme.colorScheme.error
+    item.state == DownloadState.PAUSED || item.state == DownloadState.CANCELED -> MaterialTheme.colorScheme.onSurfaceVariant
     else -> MaterialTheme.colorScheme.primary
 }

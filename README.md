@@ -6,7 +6,7 @@
 - 无需服务器：解析、下载、保存全部在手机上完成
 - 可选「远程解析接口」兜底（自建 cobalt 等），应对平台风控
 
-> **下载安装**：直接安装调试包 → [Releases · v1.0.0 `VideoDownload-1.0.0-debug.apk`](https://github.com/DACINGC/VideoDownload/releases/latest)
+> **下载安装**：直接安装调试包 → [Releases · 最新版本 `VideoDownload-1.0.1-debug.apk`](https://github.com/DACINGC/VideoDownload/releases/latest)
 > （`minSdk 24` / `targetSdk 34`，debug 签名，仅供测试）
 
 ![应用图标](docs/icon-512.png)
@@ -26,6 +26,7 @@
 | 后台下载 | 前台服务 + 通知栏进度，退到后台不中断 |
 | 相册保存 | Android 10+ 走 MediaStore 写入 `Movies/VideoDownload`，无需存储权限 |
 | 下载管理 | 暂停 / 继续 / 取消 / 重试 / 打开 / 分享 / 删除，状态持久化 |
+| 删除反馈 | 点「删除文件」立即提示「已删除文件」并把条目移出列表；文件已被外部删除的旧记录显示「文件已删除」并可重新下载 |
 | 设置 | 并发数、仅 Wi-Fi、B站/抖音 Cookie、自定义 UA、远程解析接口 |
 
 ### 界面预览
@@ -41,6 +42,10 @@
 | HLS 合并完成 | 设置 |
 | --- | --- |
 | ![HLS](docs/screenshots/05-hls-completed.png) | ![设置](docs/screenshots/07-settings.png) |
+
+| 删除文件（底部提示 + 条目移除） | 文件已删除（旧记录兜底） |
+| --- | --- |
+| ![删除反馈](docs/screenshots/10-delete-toast.png) | ![文件已删除](docs/screenshots/11-missing-file.png) |
 
 解析失败时会给出平台专属原因，解析过程可展开查看：
 
@@ -133,7 +138,7 @@ app/build/outputs/apk/debug/app-debug.apk
 ```
 
 不想自己编译的话，可直接下载已发布的调试包：
-[Releases · v1.0.0](https://github.com/DACINGC/VideoDownload/releases/tag/v1.0.0)
+[Releases · 最新版本](https://github.com/DACINGC/VideoDownload/releases/latest)
 （`minSdk 24` / `targetSdk 34`，debug 签名，仅供测试；APK 体积约 16.4 MB，不纳入 Git 版本库）。
 
 也可以直接用 Android Studio 打开根目录运行。
@@ -148,7 +153,7 @@ gradle :app:testDebugUnitTest
 
 ## 6. 验证记录
 
-以下结果均在 Android 16（API 36，1080×2400）模拟器上安装 `VideoDownload-1.0.0-debug.apk`（v1.0.0 Release 资产）实测：
+以下结果均在 Android 16（API 36，1080×2400）模拟器上安装 `VideoDownload-1.0.1-debug.apk` 实测：
 
 | 验证项 | 方法 | 结果 |
 | --- | --- | --- |
@@ -156,7 +161,8 @@ gradle :app:testDebugUnitTest
 | MP4 下载 | 点「下载到相册」并等待完成 | 相册生成 `Movies/VideoDownload/*.mp4`，大小 **51,973,319 字节**，与 B 站 playurl 返回的 `durl.size` 完全一致；文件头 `ftypisom`，含 `moov`/`mvhd`，可正常播放 |
 | 断点续传 | 下到 13,680,326 字节时暂停，再继续 | `.part` 从 13.68MB 继续增长到 19.96MB（未重新下载），最终文件仍为 51,973,319 字节 |
 | HLS 合并 | 下载 Apple 公开 fMP4 HLS（含 `EXT-X-BYTERANGE`） | 合并结果 **27,672,619 字节**，与源文件字节数一致；容器 `ftypmp42` 且含 `moof`/`mdat`，是合法 fMP4 |
-| 删除文件 | 在下载列表点「删除文件」 | MediaStore 记录与 `/sdcard/Movies/VideoDownload` 中的文件同步移除 |
+| 删除文件 | 在下载列表点「删除文件」 | 底部弹出「已删除文件」提示，条目立即从列表移除（4→3 个任务），MediaStore 与 `/sdcard/Movies/VideoDownload` 中的文件同步移除（2→1 个文件） |
+| 旧记录兜底 | 打开文件已被删除的历史条目 | 状态显示「文件已删除」，操作按钮切换为「重新下载 / 移除」，不再误导为「已保存到相册」 |
 | 错误提示 | 分享一个已被删除的抖音作品短链 | 正确识别短链落地页中的作品 id，展示平台专属失败原因，解析过程可展开 |
 | 单元测试 | `gradle :app:testDebugUnitTest` | **26 个用例全部通过**（链接解析 12、B站 4、抖音 5、HLS 5） |
 
