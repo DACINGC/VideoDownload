@@ -6,7 +6,7 @@
 - 无需服务器：解析、下载、保存全部在手机上完成
 - 可选「远程解析接口」兜底（自建 cobalt 等），应对平台风控
 
-> **下载安装**：直接安装调试包 → [Releases · 最新版本 `VideoDownload-1.0.1-debug.apk`](https://github.com/DACINGC/VideoDownload/releases/latest)
+> **下载安装**：直接安装调试包 → [Releases · 最新版本](https://github.com/DACINGC/VideoDownload/releases/latest)
 > （`minSdk 24` / `targetSdk 34`，debug 签名，仅供测试）
 
 ![应用图标](docs/icon-512.png)
